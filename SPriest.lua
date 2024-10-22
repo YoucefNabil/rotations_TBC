@@ -76,7 +76,7 @@ local exeOnLoad = function()
 	end)
 	function _A.castdelay(idd, delay) -- always use lowercase
 		if delay == nil then return true end
-		if _A.casttimers[idd]==nil then return true end
+		if _A.casttimers[string_lower(idd)]==nil then return true end
 		return (_A.GetTime() - _A.casttimers[idd]) >= delay
 	end
 	--==============================================
@@ -164,7 +164,7 @@ local YSP = {
 	smite = function()
 		if not player:moving() then
 			local target = Object("target")
-			if target and target:enemy() and target:infront() and target:spellrange("smite") and target:los() then return target:cast("smite") end
+			if target and target:enemy() and target:infront() and target:spellrange("Smite") and target:los() then return target:cast("Smite") end
 		end
 	end,
 	--=========================
@@ -174,67 +174,67 @@ local YSP = {
 		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<.3 then return player:Cast("Shadowform") end
 	end,
 	vampiric_touch = function()
-		if #_A.mindflaytb>=2  or not player:ischanneling("mind flay") then
-			if not player:moving() and _A.castdelay("vampiric touch", .3) and not player:iscasting("vampiric touch") then
+		if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
+			if not player:moving() and _A.castdelay("Vampiric Touch", .3) and not player:iscasting("Vampiric Touch") then
 				local target = Object("target")
 				if target and target:enemy() and target:spellrange("Vampiric Touch")
 					then 
-					if not target:debuff("Vampiric Touch") and target:los() then return target:cast("vampiric touch") end
+					if not target:debuff("Vampiric Touch") and target:los() then return target:cast("Vampiric Touch") end
 					local debuffremain = target:debuffduration("Vampiric Touch")
-					if debuffremain and debuffremain>0 and debuffremain<(castduration("Vampiric Touch")+1) and target:los() then return target:cast("vampiric touch", true) end
+					if debuffremain and debuffremain>0 and debuffremain<(castduration("Vampiric Touch")+1) and target:los() then return target:cast("Vampiric Touch", true) end
 				end
 			end
 		end
 	end,
 	shadowword_pain = function()
-		if #_A.mindflaytb>=2  or not player:ischanneling("mind flay") then
+		if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
 			local target = Object("target")
-			if target and target:enemy() and target:spellrange("shadow word: pain") then
-				if not target:debuff("Shadow Word: Pain") and target:los() then return target:cast("shadow word: pain", true) end
+			if target and target:enemy() and target:spellrange("Shadow Word: Pain") then
+				if not target:debuff("Shadow Word: Pain") and target:los() then return target:cast("Shadow Word: Pain", true) end
 				local debuffremain2 = target:debuffduration("Shadow Word: Pain")
-				if debuffremain2 and debuffremain2>0 and debuffremain2<1.5 and target:los() then return target:cast("shadow word: pain", true) end
+				if debuffremain2 and debuffremain2>0 and debuffremain2<1.5 and target:los() then return target:cast("Shadow Word: Pain", true) end
 			end
 		end
 	end,
 	mindblast = function()
-		if #_A.mindflaytb>=2 or not player:ischanneling("mind flay") then
+		if #_A.mindflaytb>=2 or not player:ischanneling("Mind Flay") then
 			if not player:moving() and player:SpellCooldown("Mind Blast")<.3 and not player:iscasting("Mind Blast") then
 				local target = Object("target")
-				if target and target:enemy() and target:infront() and target:spellrange("mind blast") and target:los() then return target:cast("Mind Blast", true) end
+				if target and target:enemy() and target:infront() and target:spellrange("Mind Blast") and target:los() then return target:cast("Mind Blast", true) end
 			end
 		end
 	end,
 	deathspell = function()
-		if #_A.mindflaytb>=2 or not player:ischanneling("mind flay") then
+		if #_A.mindflaytb>=2 or not player:ischanneling("Mind Flay") then
 			local target = Object("target")
-			if target and target:enemy() and target:spellrange("shadow word: death") and target:Health()<20 and target:los() then return target:cast("shadow word: death", true) end
+			if target and target:enemy() and target:spellrange("Shadow Word: Death") and target:Health()<20 and target:los() then return target:cast("Shadow Word: Death", true) end
 		end
 	end,
 	mindflay = function()
-		if not player:ischanneling("mind flay") and not player:moving() then 
+		if not player:ischanneling("Mind Flay") and not player:moving() then 
 			local target = Object("target")
-			if target and target:enemy() and target:spellrange("mind flay") and target:infront() and target:los() then return target:cast("mind flay") end
+			if target and target:enemy() and target:spellrange("Mind Flay") and target:infront() and target:los() then return target:cast("Mind Flay") end
 		end
 	end,
 	--=========================
 	--========================= AOE filler
 	--=========================
 	shadowword_pain_any = function()
-		if not player:ischanneling("mind flay") or #_A.mindflaytb>=2 then
-			local lowest = Object("lowestEnemyInSpellRangeDOT(shadow word: pain)")
-			if lowest then return lowest:cast("shadow word: pain") end
+		if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
+			local lowest = Object("lowestEnemyInSpellRangeDOT(Shadow Word: Pain)")
+			if lowest then return lowest:cast("Shadow Word: Pain") end
 		end
 	end,
 	shadowword_execute_any = function()
-		if not player:ischanneling("mind flay") or #_A.mindflaytb>=2 then
-			local lowest = Object("lowestEnemyInSpellRangeExecute(shadow word: death)")
-			if lowest then return lowest:cast("shadow word: death") end
+		if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
+			local lowest = Object("lowestEnemyInSpellRangeExecute(Shadow Word: Death)")
+			if lowest then return lowest:cast("Shadow Word: Death") end
 		end
 	end,
 }
 local inCombat = function()
 	player = Object("player")
-	if not player:ischanneling("mind flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
+	if not player:ischanneling("Mind Flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
 	--=============Debugging section
 	--=============
 	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually buttons
