@@ -171,6 +171,14 @@ local YSP = {
 	--=========================
 	--========================= Single Target
 	--=========================
+	vampiric_embrace = function()
+		if not player:ischanneling("Mind Flay") then
+			local target = Object("target")
+			if target and target:enemy() and target:spellrange("Vampiric Embrace") then
+				if not target:debuff("Vampiric Embrace") and target:los() then return target:cast("Vampiric Embrace", true) end
+			end
+		end
+	end,
 	shadowform_stance = function()
 		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<.3 then return player:Cast("Shadowform") end
 	end,
@@ -245,6 +253,7 @@ local inCombat = function()
 		YSP.shadowform_stance()
 		YSP.vampiric_touch()
 		YSP.shadowword_pain()
+		YSP.vampiric_embrace()
 		YSP.mindblast()
 		YSP.deathspell()
 		YSP.mindflay()
