@@ -68,7 +68,7 @@ local exeOnLoad = function( --==================== loading stuff for this profil
 			end
 		end
 	end)
-	_A.Listener:Add("spellcasts", {"UNIT_SPELLCAST_START", "UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_FAILED"}, function(event, unit, spellname)-- no work with channels
+	_A.Listener:Add("spellcasts", {"UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_FAILED"}, function(event, unit, spellname)-- no work with channels
 		if unit == "player" then
 			_A.casttimers[string_lower(spellname)] = _A.GetTime()
 		end
