@@ -3,7 +3,9 @@ local U = _A.Cache.Utils -- U.playerGUID
 local player
 local string_lower = string.lower
 local _tonumber = tonumber
-local function uid(unit, spellID)
+--======================= probably unnecessary spaghetti code alert:
+--======================= all auras
+local function uid(unit, spellID) -- any aura
 	if spellID then 
 		for i=1, 40 do
 			local pullingbuffname,_,_,_,_,_,_,_,_,_,pullingbuffid = _A.UnitBuff(unit, i)
@@ -20,7 +22,7 @@ local function uid(unit, spellID)
 	end
 	return false
 end
-local function uidme(unit, spellID)
+local function uidme(unit, spellID) -- player auras only
 	if spellID then 
 		for i=1, 40 do
 			local pullingbuffname,_,_,_,_,_,_,pullingbuffsource,_,_,pullingbuffid = _A.UnitBuff(unit, i)
@@ -37,7 +39,7 @@ local function uidme(unit, spellID)
 	end
 	return false
 end
-local function uidremain(unit, spellID)
+local function uidremain(unit, spellID) -- player auras only remaining duration
 	if spellID then 
 		for i=1, 40 do
 			local pullingbuffname,_,_,_,_,_,endtime,pullingbuffsource,_,_,pullingbuffid = _A.UnitBuff(unit, i)
@@ -55,6 +57,135 @@ local function uidremain(unit, spellID)
 	end
 	return 0
 end
+local function uidremainany(unit, spellID) -- tracks everything
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname,_,_,_,_,_,endtime,pullingbuffsource,_,_,pullingbuffid = _A.UnitBuff(unit, i)
+			local pullingbuffname2,_,_,_,_,_,endtime2,pullingbuffsource2,_,_,pullingbuffid2 = _A.UnitDebuff(unit, i)
+			local systime = _A.GetTime()
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid and pullingbuffid == spellID and endtime then return endtime - systime end
+				if pullingbuffid2 and pullingbuffid2 == spellID and endtime2 then return endtime2 - systime  end
+			end
+			if _tonumber(spellID)==nil then
+				if pullingbuffname and string_lower(pullingbuffname) == string_lower(spellID) and endtime then return endtime - systime  end
+				if pullingbuffname2 and string_lower(pullingbuffname2) == string_lower(spellID) and endtime2 then return endtime2 - systime  end
+			end
+		end
+	end
+	return 0
+end
+--======================= only buffs
+local function buffid(unit, spellID)
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname,_,_,_,_,_,_,_,_,_,pullingbuffid = _A.UnitBuff(unit, i)
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid and pullingbuffid == spellID then return true end
+				else
+				if pullingbuffname and string_lower(pullingbuffname) == string_lower(spellID) then return true end
+			end
+		end
+	end
+	return false
+end
+local function buffidme(unit, spellID)
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname,_,_,_,_,_,_,pullingbuffsource,_,_,pullingbuffid = _A.UnitBuff(unit, i)
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid and pullingbuffid == spellID and pullingbuffsource and pullingbuffsource == "player" then return true end
+				else
+				if pullingbuffname and string_lower(pullingbuffname) == string_lower(spellID) and pullingbuffsource and pullingbuffsource == "player" then return true end
+			end
+		end
+	end
+	return false
+end
+local function buffidremain(unit, spellID) -- tracks player buffs only
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname,_,_,_,_,_,endtime,pullingbuffsource,_,_,pullingbuffid = _A.UnitBuff(unit, i)
+			local systime = _A.GetTime()
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid and pullingbuffid == spellID and pullingbuffsource and pullingbuffsource == "player" and endtime then return endtime - systime end
+				else
+				if pullingbuffname and string_lower(pullingbuffname) == string_lower(spellID) and pullingbuffsource and pullingbuffsource == "player" and endtime then return endtime - systime  end
+			end
+		end
+	end
+	return 0
+end
+local function buffidremainany(unit, spellID) -- tracks everything
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname,_,_,_,_,_,endtime,pullingbuffsource,_,_,pullingbuffid = _A.UnitBuff(unit, i)
+			local systime = _A.GetTime()
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid and pullingbuffid == spellID and endtime then return endtime - systime end
+				else
+				if pullingbuffname and string_lower(pullingbuffname) == string_lower(spellID) and endtime then return endtime - systime  end
+			end
+		end
+	end
+	return 0
+end
+--======================= only debuffs
+local function debuffid(unit, spellID)
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname2,_,_,_,_,_,_,_,_,_,pullingbuffid2 = _A.UnitDebuff(unit, i)
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid2 and pullingbuffid2 == spellID then return true end
+				else
+				if pullingbuffname2 and string_lower(pullingbuffname2) == string_lower(spellID) then return true end
+			end
+		end
+	end
+	return false
+end
+local function debuffidme(unit, spellID)
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname2,_,_,_,_,_,_,pullingbuffsource2,_,_,pullingbuffid2 = _A.UnitDebuff(unit, i)
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid2 and pullingbuffid2 == spellID and pullingbuffsource2 and pullingbuffsource2 == "player" then return true end
+				else
+				if pullingbuffname2 and string_lower(pullingbuffname2) == string_lower(spellID) and pullingbuffsource2 and pullingbuffsource2 == "player" then return true end
+			end
+		end
+	end
+	return false
+end
+local function debuffidremain(unit, spellID)
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname2,_,_,_,_,_,endtime2,pullingbuffsource2,_,_,pullingbuffid2 = _A.UnitDebuff(unit, i)
+			local systime = _A.GetTime()
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid2 and pullingbuffid2 == spellID and pullingbuffsource2 and pullingbuffsource2 == "player" and endtime2 then return endtime2 - systime  end
+				else
+				if pullingbuffname2 and string_lower(pullingbuffname2) == string_lower(spellID) and pullingbuffsource2 and pullingbuffsource2 == "player" and endtime2 then return endtime2 - systime  end
+			end
+		end
+	end
+	return 0
+end
+local function debuffidremainany(unit, spellID) -- tracks everything
+	if spellID then 
+		for i=1, 40 do
+			local pullingbuffname2,_,_,_,_,_,endtime2,pullingbuffsource2,_,_,pullingbuffid2 = _A.UnitDebuff(unit, i)
+			local systime = _A.GetTime()
+			if _tonumber(spellID)~=nil then
+				if pullingbuffid2 and pullingbuffid2 == spellID and endtime2 then return endtime2 - systime  end
+				else
+				if pullingbuffname2 and string_lower(pullingbuffname2) == string_lower(spellID) and endtime2 then return endtime2 - systime  end
+			end
+		end
+	end
+	return 0
+end
+--============================== Spaghetti over
 local function castduration(spellID)
 	local tempvar = (select(7,GetSpellInfo(spellID)))
 	return tempvar and tempvar/1000 or 0
@@ -176,7 +307,7 @@ local exeOnLoad = function()
 	_A.FakeUnits:Add('lowestEnemyInSpellRangeDOT', function(num,spell)
 		local tempTable = {}
 		for _, Obj in pairs(_A.OM:Get('EnemyCombat')) do
-		-- for _, Obj in pairs(_A.OM:Get('Enemy')) do
+			-- for _, Obj in pairs(_A.OM:Get('Enemy')) do
 			if _A.notimmune(Obj) and Obj:spellrange(spell) and not uidme(Obj.guid, "shadow word: pain") and Obj:los() then
 				tempTable[#tempTable+1] = {
 					guid = Obj.guid,
@@ -193,7 +324,7 @@ local exeOnLoad = function()
 	_A.FakeUnits:Add('lowestEnemyInSpellRangeExecute', function(num, spell)
 		local tempTable = {}
 		for _, Obj in pairs(_A.OM:Get('EnemyCombat')) do
-		-- for _, Obj in pairs(_A.OM:Get('Enemy')) do
+			-- for _, Obj in pairs(_A.OM:Get('Enemy')) do
 			if _A.notimmune(Obj) and Obj:spellrange(spell) and Obj:health()<15 and Obj:los() then
 				tempTable[#tempTable+1] = {
 					guid = Obj.guid,
@@ -214,14 +345,12 @@ local YSP = {
 	--=========================
 	--========================= leveling
 	--=========================
-	
 	smite = function()
 		if not player:moving() then
 			local target = Object("target")
 			if target and target:enemy() and target:infront() and target:spellrange("smite") and target:los() then return target:cast("smite") end
 		end
 	end,
-	
 	--=========================
 	--========================= Single Target
 	--=========================
@@ -229,40 +358,40 @@ local YSP = {
 		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<.3 then return player:Cast("Shadowform") end
 	end,
 	vampiric_touch = function()
-		if not player:ischanneling("mind flay") or #_A.mindflaytb>=2 then
-			if not player:moving() and _A.castdelay("vampiric touch", .3) then
+		if #_A.mindflaytb>=2  or not player:ischanneling("mind flay") then
+			if not player:moving() and _A.castdelay("vampiric touch", .3) and not player:iscasting("vampiric touch") then
 				local target = Object("target")
 				if target and target:enemy() and target:spellrange("Vampiric touch")
 					then 
-					if not uidme(target.guid,"vampiric touch") and target:los() then return target:cast("vampiric touch") end
-					local debuffremain = uidremain(target.guid,"vampiric touch")
-					if debuffremain>0 and debuffremain<(castduration("vampiric touch")+1) and target:los() then return target:cast("vampiric touch") end
+					if not debuffidme(target.guid,"vampiric touch") and target:los() then return target:cast("vampiric touch") end
+					local debuffremain = debuffidremain(target.guid,"vampiric touch")
+					if debuffremain>0 and debuffremain<(castduration("vampiric touch")+1) and target:los() then return target:cast("vampiric touch", true) end
 				end
 			end
 		end
 	end,
 	shadowword_pain = function()
-		if not player:ischanneling("mind flay") or #_A.mindflaytb>=2 then
+		if #_A.mindflaytb>=2  or not player:ischanneling("mind flay") then
 			local target = Object("target")
 			if target and target:enemy() and target:spellrange("shadow word: pain") then
-				if not uidme(target.guid,"shadow word: pain") and target:los() then return target:cast("shadow word: pain") end
-				local debuffremain2 = uidremain(target.guid,"shadow word: pain")
-				if debuffremain2>0 and debuffremain2<1.5 and target:los() then return target:cast("shadow word: pain") end
+				if not debuffidme(target.guid,"shadow word: pain") and target:los() then return target:cast("shadow word: pain", true) end
+				local debuffremain2 = debuffidremain(target.guid,"shadow word: pain")
+				if debuffremain2>0 and debuffremain2<1.5 and target:los() then return target:cast("shadow word: pain", true) end
 			end
 		end
 	end,
 	mindblast = function()
-		if not player:ischanneling("mind flay") or #_A.mindflaytb>=2 then
-			if not player:moving() and player:SpellCooldown("Mind Blast")<.3 then
+		if #_A.mindflaytb>=2 or not player:ischanneling("mind flay") then
+			if not player:moving() and player:SpellCooldown("Mind Blast")<.3 and not player:iscasting("Mind Blast") then
 				local target = Object("target")
-				if target and target:enemy() and target:infront() and target:spellrange("mind blast") and target:los() then return target:cast("Mind Blast") end
+				if target and target:enemy() and target:infront() and target:spellrange("mind blast") and target:los() then return target:cast("Mind Blast", true) end
 			end
 		end
 	end,
 	deathspell = function()
-		if not player:ischanneling("mind flay") or #_A.mindflaytb>=2 then
+		if #_A.mindflaytb>=2 or not player:ischanneling("mind flay") then
 			local target = Object("target")
-			if target and target:enemy() and target:spellrange("shadow word: death") and target:Health()<20 and target:los() then return target:cast("shadow word: death") end
+			if target and target:enemy() and target:spellrange("shadow word: death") and target:Health()<20 and target:los() then return target:cast("shadow word: death", true) end
 		end
 	end,
 	mindflay = function()
