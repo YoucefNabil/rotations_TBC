@@ -247,7 +247,7 @@ local exeOnLoad = function()
 				-- this voodoo is for counting mind flay ticks
 				-- the point of this is to clip/self interrupt the channel right after the second tick, since the third ticks takes too long, apparently it's a dps increase or something
 				-- this is what the "#_A.mindflaytb>=2" checks in InCombat are for
-				print(#_A.mindflaytb)
+				-- if #_A.mindflaytb>=2 then print(#_A.mindflaytb) end
 			end
 		end
 	end)
