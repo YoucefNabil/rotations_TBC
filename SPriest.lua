@@ -8,7 +8,8 @@ local function castduration(spellID)
 	local tempvar = (select(7,GetSpellInfo(spellID)))
 	return tempvar and tempvar/1000 or 0
 end
-
+local exeOnUnload = function(
+end)
 local exeOnLoad = function( --==================== loading stuff for this profile specifically
 	--==================== Manual Button Hooks
 	_A.pressedbuttonat = 0
@@ -51,9 +52,9 @@ local exeOnLoad = function( --==================== loading stuff for this profil
 		local modkeyb = IsShiftKeyDown()
 		if modkeyb then
 			return true
-			else
-			return false
-		end
+		else
+		return false
+	end
 	end
 	--==================== Events and event related
 	_A.mindflaytb = {}
