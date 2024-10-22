@@ -3,15 +3,14 @@ local U = _A.Cache.Utils -- U.playerGUID
 local player
 local string_lower = string.lower
 local _tonumber = tonumber
---============================== Spaghetti over
+--============================== Misc Functions
 local function castduration(spellID)
 	local tempvar = (select(7,GetSpellInfo(spellID)))
 	return tempvar and tempvar/1000 or 0
 end
---=================================
---=================================
---=================================
-local exeOnLoad = function()
+
+local exeOnLoad = function( --==================== loading stuff for this profile specifically
+	--==================== Manual Button Hooks
 	_A.pressedbuttonat = 0
 	_A.buttondelay = 0.6
 	_A.hooksecurefunc("UseAction", function(...)
@@ -56,6 +55,7 @@ local exeOnLoad = function()
 			return false
 		end
 	end
+	--==================== Events and event related
 	_A.mindflaytb = {}
 	_A.casttimers = {} -- doesnt work with channeled spells
 	_A.Listener:Add("delaycasts", {"COMBAT_LOG_EVENT_UNFILTERED", "UNIT_SPELLCAST_SUCCEEDED"}, function(event, _, subevent, guidsrc, srcname, weirdnumber, guiddest, destname, sameweirdnumber, idd,spellname,lowweirdnumber,totalamount,overheal,thirdnumber)-- new
@@ -63,9 +63,8 @@ local exeOnLoad = function()
 			if subevent=="SPELL_PERIODIC_DAMAGE" and spellname == "Mind Flay" then
 				_A.mindflaytb[#_A.mindflaytb+1]=_A.GetTime()
 				-- this voodoo is for counting mind flay ticks
-				-- the point of this is to clip/self interrupt the channel right after the second tick, since the third ticks takes too long, apparently it's a dps increase or something
+				-- the point of this is to clip/self interrupt the channel right after the second tick, since the third tick takes too long, apparently it's a dps increase or something
 				-- this is what the "#_A.mindflaytb>=2" checks in InCombat are for
-				-- if #_A.mindflaytb>=2 then print(#_A.mindflaytb) end
 			end
 		end
 	end)
@@ -74,14 +73,13 @@ local exeOnLoad = function()
 			_A.casttimers[string_lower(spellname)] = _A.GetTime()
 		end
 	end)
-	function _A.castdelay(idd, delay) -- always use lowercase
+	function _A.castdelay(idd, delay)
 		if delay == nil then return true end
 		iddd = string_lower(idd)
 		if _A.casttimers[iddd]==nil then return true end
 		return (_A.GetTime() - _A.casttimers[iddd]) >= delay
 	end
-	--==============================================
-	--==============================================
+	--==================== Custom UnitIDs
 	function _A.tbltostr(tbl)
 		local result = {}
 		for _, value in ipairs(tbl) do
@@ -155,12 +153,11 @@ local exeOnLoad = function()
 		end
 		return tempTable[num] and tempTable[num].guid
 	end)
-end
-local exeOnUnload = function()
-end
+end)
+--==================== Rotation Table
 local YSP = {
 	--=========================
-	--========================= leveling
+	--========================= leveling related
 	--=========================
 	smite = function()
 		if not player:moving() then
@@ -218,7 +215,7 @@ local YSP = {
 		end
 	end,
 	--=========================
-	--========================= AOE filler
+	--========================= AOE/filler
 	--=========================
 	shadowword_pain_any = function()
 		if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
@@ -233,6 +230,7 @@ local YSP = {
 		end
 	end,
 }
+--==================== Running the rotation
 local inCombat = function()
 	player = Object("player")
 	if not player:ischanneling("Mind Flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
@@ -277,4 +275,4 @@ _A.CR:Add("Priest", {
 	-- pooling = false,
 	load = exeOnLoad,
 	unload = exeOnUnload
-})						
+})							
