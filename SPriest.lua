@@ -52,8 +52,8 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 		local modkeyb = IsShiftKeyDown()
 		if modkeyb then
 			return true
-		else
-		return false
+			else
+			return false
 		end
 	end
 	--==================== Events and event related
@@ -216,66 +216,66 @@ local YSP = {
 			local target = Object("target")
 			if target and target:enemy() and target:spellrange("Mind Flay") and target:infront() and target:los() then return target:cast("Mind Flay") end
 		end
-		end,
-		--=========================
-		--========================= AOE/filler
-		--=========================
-		shadowword_pain_any = function()
-			if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
-				local lowest = Object("lowestEnemyInSpellRangeDOT(Shadow Word: Pain)")
-				if lowest then return lowest:cast("Shadow Word: Pain") end
-			end
-		end,
-		shadowword_execute_any = function()
-			if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
-				local lowest = Object("lowestEnemyInSpellRangeExecute(Shadow Word: Death)")
-				if lowest then return lowest:cast("Shadow Word: Death") end
-			end
-		end,
-		}
-		--==================== Running the rotation
-		local inCombat = function()
-			if not player then player = Object("player") end
-			if not player:ischanneling("Mind Flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
-			--=============Debugging section
-			--=============
-			if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
-			--============= Single Target Main rotation
-			if not _A.modifier_shift() then -- holding shift skips this
-				YSP.shadowform_stance()
-				YSP.vampiric_touch()
-				YSP.shadowword_pain()
-				YSP.mindblast()
-				YSP.deathspell()
-				YSP.mindflay()
-			end
-			--============= Leveling
-			if player:level()<=20 then
-				YSP.smite()
-			end
-			--============= AOE fill
-			YSP.shadowword_execute_any()
-			YSP.shadowword_pain_any()
+	end,
+	--=========================
+	--========================= AOE/filler
+	--=========================
+	shadowword_pain_any = function()
+		if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
+			local lowest = Object("lowestEnemyInSpellRangeDOT(Shadow Word: Pain)")
+			if lowest then return lowest:cast("Shadow Word: Pain") end
 		end
-		
-		local spellIds_Loc = {
-		}
-		
-		local blacklist = {
-		}
-		
-		_A.CR:Add("Priest", {
-			name = "Youcef's Shadow Priest",
-			ic = inCombat,
-			ooc = inCombat,
-			use_lua_engine = true,
-			gui = GUI,
-			gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
-			wow_ver = "3.3.5",
-			apep_ver = "1.1",
-			-- ids = spellIds_Loc,
-			-- blacklist = blacklist,
-			-- pooling = false,
-			load = exeOnLoad,
-			unload = exeOnUnload
-		})									
+	end,
+	shadowword_execute_any = function()
+		if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
+			local lowest = Object("lowestEnemyInSpellRangeExecute(Shadow Word: Death)")
+			if lowest then return lowest:cast("Shadow Word: Death") end
+		end
+	end,
+}
+--==================== Running the rotation
+local inCombat = function()
+	if not player then player = Object("player") end
+	if not player:ischanneling("Mind Flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
+	--=============Debugging section
+	--=============
+	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
+	--============= Single Target Main rotation
+	if not _A.modifier_shift() then -- holding shift skips this
+		YSP.shadowform_stance()
+		YSP.vampiric_touch()
+		YSP.shadowword_pain()
+		YSP.mindblast()
+		YSP.deathspell()
+		YSP.mindflay()
+	end
+	--============= Leveling
+	if player:level()<=20 then
+		YSP.smite()
+	end
+	--============= AOE fill
+	YSP.shadowword_execute_any()
+	YSP.shadowword_pain_any()
+end
+
+local spellIds_Loc = {
+}
+
+local blacklist = {
+}
+
+_A.CR:Add("Priest", {
+	name = "Youcef's Shadow Priest",
+	ic = inCombat,
+	ooc = inCombat,
+	use_lua_engine = true,
+	gui = GUI,
+	gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
+	wow_ver = "3.3.5",
+	apep_ver = "1.1",
+	-- ids = spellIds_Loc,
+	-- blacklist = blacklist,
+	-- pooling = false,
+	load = exeOnLoad,
+	unload = exeOnUnload
+})									
