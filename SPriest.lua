@@ -165,7 +165,7 @@ local YSP = {
 	smite = function()
 		if not player:moving() and player:SpellCooldown("Smite")<=.3 then
 			local target = Object("target")
-			if target and target:enemy() and target:infront() and target:spellrange("Smite") and target:los() then return target:cast("Smite") end
+			if target and target:enemy() and target:infront() and target:spellrange("Smite") and target:los() then return target:cast("Smite", true) end
 		end
 	end,
 	--=========================
