@@ -214,7 +214,7 @@ local YSP = {
 	mindflay = function()
 		if not player:ischanneling("Mind Flay") and not player:moving() then 
 			local target = Object("target")
-			if target and target:enemy() and target:spellrange("Mind Flay") and target:infront() and target:los() then return target:cast("Mind Flay") end
+			if target and target:enemy() and target:spellrange("Mind Flay") and target:infront() and target:los() then return target:cast("Mind Flay", true) end
 		end
 	end,
 	--=========================
