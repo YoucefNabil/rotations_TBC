@@ -180,11 +180,11 @@ local YSP = {
 		end
 	end,
 	shadowform_stance = function()
-		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<.3 then return player:Cast("Shadowform") end
+		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<.2 then return player:Cast("Shadowform") end
 	end,
 	vampiric_touch = function()
 		if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
-			if not player:moving() and _A.castdelay("Vampiric Touch", .3) and not player:iscasting("Vampiric Touch") then
+			if not player:moving() and _A.castdelay("Vampiric Touch", .2) and not player:iscasting("Vampiric Touch") then
 				local target = Object("target")
 				if target and target:enemy() and target:spellrange("Vampiric Touch")
 					then 
@@ -207,7 +207,7 @@ local YSP = {
 	end,
 	mindblast = function()
 		if #_A.mindflaytb>=2 or not player:ischanneling("Mind Flay") then
-			if not player:moving() and player:SpellCooldown("Mind Blast")<.3 and not player:iscasting("Mind Blast") then
+			if not player:moving() and player:SpellCooldown("Mind Blast")<.2 and not player:iscasting("Mind Blast") then
 				local target = Object("target")
 				if target and target:enemy() and target:infront() and target:spellrange("Mind Blast") and target:los() then return target:cast("Mind Blast", true) end
 			end
@@ -250,21 +250,21 @@ local inCombat = function()
 	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
 	--============= Single Target Main rotation
 	if not _A.modifier_shift() then -- holding shift skips this
-		YSP.shadowform_stance()
-		YSP.vampiric_touch()
-		YSP.shadowword_pain()
-		YSP.vampiric_embrace()
-		YSP.mindblast()
-		YSP.deathspell()
-		YSP.mindflay()
+		if YSP.shadowform_stance() then return end
+		if YSP.vampiric_touch() then return end
+		if YSP.shadowword_pain() then return end
+		if YSP.vampiric_embrace() then return end
+		if YSP.mindblast() then return end
+		if YSP.deathspell() then return end
+		if YSP.mindflay() then return end
 	end
 	--============= Leveling
 	if player:level()<=20 then
-		YSP.smite()
+		if YSP.smite() then return end
 	end
 	--============= AOE fill
-	YSP.shadowword_execute_any()
-	YSP.shadowword_pain_any()
+	if YSP.shadowword_execute_any() then return end
+	if YSP.shadowword_pain_any() then return end
 end
 
 local spellIds_Loc = {
