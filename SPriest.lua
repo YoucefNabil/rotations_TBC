@@ -11,7 +11,7 @@ end
 local exeOnUnload = function(
 end)
 local exeOnLoad = function( --==================== loading stuff for this profile specifically
-	--==================== Manual Button Hooks
+	--==================== Manual Button Hooks (this does 2 things: the first and seventh button in your action bars starts/stops the rotation. Casting a macro or a spell pauses the rotation to let the user cast stuff)
 	_A.pressedbuttonat = 0
 	_A.buttondelay = 0.6
 	_A.hooksecurefunc("UseAction", function(...)
@@ -233,11 +233,11 @@ local YSP = {
 }
 --==================== Running the rotation
 local inCombat = function()
-	player = Object("player")
+	if not player then player = Object("player") end
 	if not player:ischanneling("Mind Flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
 	--=============Debugging section
 	--=============
-	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually buttons
+	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
 	--============= Single Target Main rotation
 	if not _A.modifier_shift() then -- holding shift skips this
 		YSP.shadowform_stance()
