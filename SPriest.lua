@@ -76,8 +76,9 @@ local exeOnLoad = function()
 	end)
 	function _A.castdelay(idd, delay) -- always use lowercase
 		if delay == nil then return true end
-		if _A.casttimers[string_lower(idd)]==nil then return true end
-		return (_A.GetTime() - _A.casttimers[idd]) >= delay
+		iddd = string_lower(idd)
+		if _A.casttimers[iddd]==nil then return true end
+		return (_A.GetTime() - _A.casttimers[iddd]) >= delay
 	end
 	--==============================================
 	--==============================================
@@ -125,7 +126,7 @@ local exeOnLoad = function()
 	_A.FakeUnits:Add('lowestEnemyInSpellRangeDOT', function(num,spell)
 		local tempTable = {}
 		for _, Obj in pairs(_A.OM:Get('EnemyCombat')) do
-			if _A.notimmune(Obj) and Obj:spellrange(spell) and not uidme(Obj.guid, "shadow word: pain") and Obj:los() then
+			if _A.notimmune(Obj) and Obj:spellrange(spell) and not Obj:debuff(spell) and Obj:los() then
 				tempTable[#tempTable+1] = {
 					guid = Obj.guid,
 					health = Obj:health(),
@@ -252,8 +253,8 @@ local inCombat = function()
 		YSP.smite()
 	end
 	--============= AOE fill
-	-- YSP.shadowword_execute_any()
-	-- YSP.shadowword_pain_any()
+	YSP.shadowword_execute_any()
+	YSP.shadowword_pain_any()
 end
 
 local spellIds_Loc = {
