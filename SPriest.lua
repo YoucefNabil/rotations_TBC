@@ -74,6 +74,11 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 			_A.casttimers[string_lower(spellname)] = _A.GetTime()
 		end
 	end)
+	_A.Listener:Add("delayedspellcast", "UNIT_SPELLCAST_DELAYED", function(event, unit, spellname)-- no work with channels
+		if unit == "player" then
+			print("I got delayed!")
+		end
+	end)
 	function _A.castdelay(idd, delay)
 		if delay == nil then return true end
 		iddd = string_lower(idd)
@@ -163,7 +168,7 @@ local YSP = {
 	--========================= leveling related
 	--=========================
 	smite = function()
-		if not player:moving() and player:SpellCooldown("Smite")<=.3 then
+		if not player:moving() and player:SpellCooldown("Smite")<=.3 and not player:iscasting("Smite") then
 			local target = Object("target")
 			if target and target:enemy() and target:infront() and target:spellrange("Smite") and target:los() then return target:cast("Smite", true) end
 		end
@@ -196,8 +201,8 @@ local YSP = {
 		end
 	end,
 	shadowword_pain = function()
-	if player:SpellCooldown("Shadow Word: Pain")<=.3 then
-		if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
+		if player:SpellCooldown("Shadow Word: Pain")<=.3 then
+			if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
 				local target = Object("target")
 				if target and target:enemy() and target:spellrange("Shadow Word: Pain") then
 					if not target:debuff("Shadow Word: Pain") and target:los() then return target:cast("Shadow Word: Pain", true) end
@@ -260,21 +265,21 @@ local inCombat = function()
 	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
 	--============= Single Target Main rotation
 	if not _A.modifier_shift() then -- holding shift skips this
-		if YSP.shadowform_stance() then return end
-		if YSP.vampiric_touch() then return end
-		if YSP.shadowword_pain() then return end
-		if YSP.vampiric_embrace() then return end
-		if YSP.mindblast() then return end
-		if YSP.deathspell() then return end
-		if YSP.mindflay() then return end
+		YSP.shadowform_stance()
+		YSP.vampiric_touch()
+		YSP.shadowword_pain()
+		YSP.vampiric_embrace()
+		YSP.mindblast()
+		YSP.deathspell()
+		YSP.mindflay()
 	end
 	--============= Leveling
 	if player:level()<=20 then
-		if YSP.smite() then return end
+		YSP.smite()
 	end
 	--============= AOE fill
-	if YSP.shadowword_execute_any() then return end
-	if YSP.shadowword_pain_any() then return end
+	YSP.shadowword_execute_any()
+	YSP.shadowword_pain_any()
 end
 
 local spellIds_Loc = {
