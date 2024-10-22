@@ -76,7 +76,7 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 	end)
 	_A.Listener:Add("delayedspellcast", "UNIT_SPELLCAST_DELAYED", function(event, unit, spellname)-- no work with channels
 		if unit == "player" then
-			print("I got delayed!")
+			-- print("I got delayed!")
 		end
 	end)
 	function _A.castdelay(idd, delay)
