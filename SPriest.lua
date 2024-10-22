@@ -23,19 +23,19 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 			_A.pressedbuttonat = 0
 			if _A.DSL:Get("toggle")(_,"MasterToggle")~=true then
 				_A.Interface:toggleToggle("mastertoggle", true)
-				_A.print("ON")
+				-- _A.print("ON")
 				return true
 			end
 		end
 		if slot==79 or slot == 7 then 
 			if _A.DSL:Get("toggle")(_,"MasterToggle")~=false then
 				_A.Interface:toggleToggle("mastertoggle", false)
-				_A.print("OFF")
+				-- _A.print("OFF")
 				return true
 			end
 		end
 		--
-		if slot ~= 79 and slot ~= 7 and slot ~= 73 and slot ~= 1 and clickType ~= nil then
+		if slot ~= (79 and 7 and 73 and  1) and clickType ~= nil then
 			Type, id, subType = _A.GetActionInfo(slot)
 			if Type == "spell" or Type == "macro" -- remove macro?
 				then
@@ -168,7 +168,7 @@ local YSP = {
 	--========================= leveling related
 	--=========================
 	smite = function()
-		if not player:moving() and player:SpellCooldown("Smite")<=.3 and not player:iscasting("Smite") then
+		if not player:moving() and player:SpellCooldown("Smite")<=.3 and (not player:iscasting("Smite") or player:CastingRemaining() < 0.3) then
 			local target = Object("target")
 			if target and target:enemy() and target:infront() and target:spellrange("Smite") and target:los() then return target:cast("Smite", true) end
 		end
