@@ -292,7 +292,7 @@ local inCombat = function()
 	if not player:ischanneling("mind flay") and #_A.mindflaytb>0 then _A.mindflaytb = {} end -- clean mindflay tick table when not casting
 	if _A.buttondelayfunc()  then return end
 	--============= Single Target Main rotation
-	if not _A.modifier_shift() then
+	if not _A.modifier_shift() then -- holding shift skips this
 		YSP.shadowform_stance()
 		YSP.vampiric_touch()
 		YSP.shadowword_pain()
@@ -301,7 +301,7 @@ local inCombat = function()
 		YSP.mindflay()
 	end
 	--============= Leveling
-	if player:level()<=15 then
+	if player:level()<=20 then
 		YSP.smite()
 	end
 	--============= AOE fill
