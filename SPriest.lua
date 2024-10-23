@@ -321,7 +321,7 @@ local inCombat = function()
 		YSP.shadowword_pain_any()
 		YSP.mindflay_targetless()
 		--============= Leveling
-		if player:level()<=20 then
+		if player:level()<20 then -- level at which mindflay is unlocked
 			YSP.smite()
 		end
 	end
