@@ -199,7 +199,7 @@ local YSP = {
 	--========================= Buffs
 	--=========================
 	innerfire = function()
-		if not player:buff("Inner Fire") and player:SpellCooldown("Inner Fire")<=.3 and player:SpellUsable("Inner Fire") then return player:Cast("Inner Fire") end
+		if not player:ischanneling("Mind Flay") and not player:buff("Inner Fire") and player:SpellCooldown("Inner Fire")<=.3 and player:SpellUsable("Inner Fire") then return player:Cast("Inner Fire") end
 	end,
 	fortitude = function()
 		if not player:buff("Power Word: Fortitude") and player:SpellCooldown("Power Word: Fortitude")<=.3 and player:SpellUsable("Power Word: Fortitude") then return player:Cast("Power Word: Fortitude") end
@@ -302,26 +302,28 @@ local inCombat = function()
 	--=============Debugging section
 	--=============
 	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
-	--============= Buffs
-	YSP.fortitude()
-	YSP.innerfire()
-	--============= Single Target Main rotation
-	YSP.shadowword_execute_any() -- Execute
-	if not _A.modifier_shift() then -- holding shift skips this
-		YSP.shadowform_stance()
-		YSP.vampiric_touch()
-		YSP.shadowword_pain()
-		YSP.vampiric_embrace()
-		YSP.mindblast()
-		YSP.mindflay()
-	end
-	--============= Targetless
-	YSP.mindblast_targetless()
-	YSP.shadowword_pain_any()
-	YSP.mindflay_targetless()
-	--============= Leveling
-	if player:level()<=20 then
-		YSP.smite()
+	if (not player:IscastingAnySpell() or player:CastingRemaining() < 0.3) then
+		--============= Buffs
+		YSP.fortitude()
+		YSP.innerfire()
+		--============= Single Target Main rotation
+		YSP.shadowword_execute_any() -- Execute
+		if not _A.modifier_shift() then -- holding shift skips this
+			YSP.shadowform_stance()
+			YSP.vampiric_touch()
+			YSP.shadowword_pain()
+			YSP.vampiric_embrace()
+			YSP.mindblast()
+			YSP.mindflay()
+		end
+		--============= Targetless
+		YSP.mindblast_targetless()
+		YSP.shadowword_pain_any()
+		YSP.mindflay_targetless()
+		--============= Leveling
+		if player:level()<=20 then
+			YSP.smite()
+		end
 	end
 end
 local spellIds_Loc = {
@@ -331,15 +333,15 @@ local blacklist = {
 }
 
 _A.CR:Add("Priest", {
-	name = "Youcef's Shadow Priest",
-	ic = inCombat,
-	ooc = inCombat,
-	use_lua_engine = true,
-	gui = GUI,
-	gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
-	wow_ver = "3.3.5",
-	apep_ver = "1.1",
-	-- ids = spellIds_Loc,
+name = "Youcef's Shadow Priest",
+ic = inCombat,
+ooc = inCombat,
+use_lua_engine = true,
+gui = GUI,
+gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
+wow_ver = "3.3.5",
+apep_ver = "1.1",
+-- ids = spellIds_Loc,
 -- blacklist = blacklist,
 -- pooling = false,
 load = exeOnLoad,
