@@ -317,9 +317,11 @@ local inCombat = function()
 			YSP.mindflay()
 		end
 		--============= Targetless
-		YSP.mindblast_targetless()
 		YSP.shadowword_pain_any()
-		YSP.mindflay_targetless()
+		if not _A.modifier_shift() then -- holding shift skips this	
+			YSP.mindblast_targetless()
+			YSP.mindflay_targetless()
+		end
 		--============= Leveling
 		if player:level()<20 then -- level at which mindflay is unlocked
 			YSP.smite()
@@ -333,10 +335,10 @@ local blacklist = {
 }
 
 _A.CR:Add("Priest", {
-name = "Youcef's Shadow Priest",
-ic = inCombat,
-ooc = inCombat,
-use_lua_engine = true,
+	name = "Youcef's Shadow Priest",
+	ic = inCombat,
+	ooc = inCombat,
+	use_lua_engine = true,
 gui = GUI,
 gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
 wow_ver = "3.3.5",
