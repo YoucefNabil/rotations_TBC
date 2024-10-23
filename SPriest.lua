@@ -161,6 +161,28 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 		return tempTable[num] and tempTable[num].guid
 	end
 	)
+	_A.FakeUnits:Add('lowestEnemyInSpellRange', function(num, spell)
+		local tempTable = {}
+		local target = Object("target")
+		-- if target and target:enemy() and target:spellRange(spell) and target:Infront() and _A.dontbreakcc(target) and _A.notimmune(target)  and target:los() then
+		if target and target:enemy() and target:spellRange(spell) and target:Infront() and _A.notimmune(target)  and target:los() then
+			return target and target.guid
+		end
+		for _, Obj in pairs(_A.OM:Get('EnemyCombat')) do
+			-- if Obj:spellRange(spell) and _A.dontbreakcc(Obj) and _A.notimmune(Obj) and  Obj:Infront() and Obj:los() then
+			if Obj:spellRange(spell) and _A.notimmune(Obj) and  Obj:Infront() and Obj:los() then
+				tempTable[#tempTable+1] = {
+					guid = Obj.guid,
+					health = Obj:health(),
+					isplayer = Obj.isplayer and 1 or 0
+				}
+			end
+		end
+		if #tempTable>1 then
+			table.sort( tempTable, function(a,b) return (a.isplayer > b.isplayer) or (a.isplayer == b.isplayer and a.health < b.health) end )
+		end
+		return tempTable[num] and tempTable[num].guid
+	end)
 end
 --==================== Rotation Table
 local YSP = {
@@ -168,16 +190,25 @@ local YSP = {
 	--========================= leveling related
 	--=========================
 	smite = function()
-		if not player:moving() and player:SpellCooldown("Smite")<=.3 and (not player:iscasting("Smite") or player:CastingRemaining() < 0.3) then
-			local target = Object("target")
-			if target and target:enemy() and target:infront() and target:spellrange("Smite") and target:los() then return target:cast("Smite", true) end
+		if not player:moving() and player:SpellCooldown("Smite")<=.3 and player:SpellUsable("Smite") and (not player:iscasting("Smite") or player:CastingRemaining() < 0.3) then
+			local target = Object("lowestEnemyInSpellRange(Smite)")
+			if target then return target:cast("Smite", true) end
 		end
+	end,
+	--=========================
+	--========================= Buffs
+	--=========================
+	innerfire = function()
+		if not player:buff("Inner Fire") and player:SpellCooldown("Inner Fire")<=.3 and player:SpellUsable("Inner Fire") then return player:Cast("Inner Fire") end
+	end,
+	fortitude = function()
+		if not player:buff("Power Word: Fortitude") and player:SpellCooldown("Power Word: Fortitude")<=.3 and player:SpellUsable("Power Word: Fortitude") then return player:Cast("Power Word: Fortitude") end
 	end,
 	--=========================
 	--========================= Single Target
 	--=========================
 	vampiric_embrace = function()
-		if not player:ischanneling("Mind Flay") and player:SpellCooldown("Vampiric Embrace")<=.3 then
+		if not player:ischanneling("Mind Flay") and player:SpellCooldown("Vampiric Embrace")<=.3 and player:SpellUsable("Vampiric Embrace") then
 			local target = Object("target")
 			if target and target:enemy() and target:spellrange("Vampiric Embrace") then
 				if not target:debuff("Vampiric Embrace") and target:los() then return target:cast("Vampiric Embrace", true) end
@@ -185,11 +216,11 @@ local YSP = {
 		end
 	end,
 	shadowform_stance = function()
-		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<=.3 then return player:Cast("Shadowform") end
+		if not player:buff("Shadowform") and player:SpellCooldown("Shadowform")<=.3 and player:SpellUsable("Shadowform") then return player:Cast("Shadowform") end
 	end,
 	vampiric_touch = function()
 		if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
-			if not player:moving() and _A.castdelay("Vampiric Touch", .2) and not player:iscasting("Vampiric Touch") and player:SpellCooldown("Vampiric Touch")<=.3 then
+			if not player:moving() and _A.castdelay("Vampiric Touch", .2) and not player:iscasting("Vampiric Touch") and player:SpellCooldown("Vampiric Touch")<=.3 and player:SpellUsable("Vampiric Touch") then
 				local target = Object("target")
 				if target and target:enemy() and target:spellrange("Vampiric Touch")
 					then 
@@ -204,7 +235,7 @@ local YSP = {
 		if player:SpellCooldown("Shadow Word: Pain")<=.3 then
 			if #_A.mindflaytb>=2  or not player:ischanneling("Mind Flay") then
 				local target = Object("target")
-				if target and target:enemy() and target:spellrange("Shadow Word: Pain") then
+				if target and target:enemy() and target:spellrange("Shadow Word: Pain") and player:SpellUsable("Shadow Word: Pain") then
 					if not target:debuff("Shadow Word: Pain") and target:los() then return target:cast("Shadow Word: Pain", true) end
 					local debuffremain2 = target:debuffduration("Shadow Word: Pain")
 					if debuffremain2 and debuffremain2>0 and debuffremain2<1.5 and target:los() then return target:cast("Shadow Word: Pain", true) end
@@ -214,22 +245,14 @@ local YSP = {
 	end,
 	mindblast = function()
 		if #_A.mindflaytb>=2 or not player:ischanneling("Mind Flay") then
-			if not player:moving() and player:SpellCooldown("Mind Blast")<=.3 and not player:iscasting("Mind Blast") then
+			if not player:moving() and player:SpellCooldown("Mind Blast")<=.3 and not player:iscasting("Mind Blast") and player:SpellUsable("Mind Blast") then
 				local target = Object("target")
 				if target and target:enemy() and target:infront() and target:spellrange("Mind Blast") and target:los() then return target:cast("Mind Blast", true) end
 			end
 		end
 	end,
-	deathspell = function()
-		if player:SpellCooldown("Shadow Word: Death")<=.3 then
-			if #_A.mindflaytb>=2 or not player:ischanneling("Mind Flay") then
-				local target = Object("target")
-				if target and target:enemy() and target:spellrange("Shadow Word: Death") and target:Health()<20 and target:los() then return target:cast("Shadow Word: Death", true) end
-			end
-		end
-	end,
 	mindflay = function()
-		if player:SpellCooldown("Mind Flay")<=.3 then
+		if player:SpellCooldown("Mind Flay")<=.3 and player:SpellUsable("Mind Flay") then
 			if not player:ischanneling("Mind Flay") and not player:moving() then 
 				local target = Object("target")
 				if target and target:enemy() and target:spellrange("Mind Flay") and target:infront() and target:los() then return target:cast("Mind Flay", true) end
@@ -237,10 +260,10 @@ local YSP = {
 		end
 	end,
 	--=========================
-	--========================= AOE/filler
+	--========================= targetless
 	--=========================
 	shadowword_pain_any = function()
-		if player:SpellCooldown("Shadow Word: Pain")<=.3 then
+		if player:SpellCooldown("Shadow Word: Pain")<=.3 and player:SpellUsable("Shadow Word: Pain") then
 			if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
 				local lowest = Object("lowestEnemyInSpellRangeDOT(Shadow Word: Pain)")
 				if lowest then return lowest:cast("Shadow Word: Pain") end
@@ -248,10 +271,26 @@ local YSP = {
 		end
 	end,
 	shadowword_execute_any = function()
-		if player:SpellCooldown("Shadow Word: Death")<=.3 then
+		if player:SpellCooldown("Shadow Word: Death")<=.3 and player:SpellUsable("Shadow Word: Death") then
 			if not player:ischanneling("Mind Flay") or #_A.mindflaytb>=2 then
 				local lowest = Object("lowestEnemyInSpellRangeExecute(Shadow Word: Death)")
 				if lowest then return lowest:cast("Shadow Word: Death") end
+			end
+		end
+	end,
+	mindblast_targetless = function()
+		if #_A.mindflaytb>=2 or not player:ischanneling("Mind Flay") then
+			if not player:moving() and player:SpellCooldown("Mind Blast")<=.3 and not player:iscasting("Mind Blast") and player:SpellUsable("Mind Blast") then
+				local target = Object("lowestEnemyInSpellRange(Mind Blast)")
+				if target then return target:cast("Mind Blast", true) end
+			end
+		end
+	end,
+	mindflay_targetless = function()
+		if player:SpellCooldown("Mind Flay")<=.3 and player:SpellUsable("Mind Flay") then
+			if not player:ischanneling("Mind Flay") and not player:moving() then 
+				local target = Object("lowestEnemyInSpellRange(Mind Flay)")
+				if target then return target:cast("Mind Flay", true) end
 			end
 		end
 	end,
@@ -263,25 +302,28 @@ local inCombat = function()
 	--=============Debugging section
 	--=============
 	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
+	--============= Buffs
+	YSP.fortitude()
+	YSP.innerfire()
 	--============= Single Target Main rotation
+	YSP.shadowword_execute_any() -- Execute
 	if not _A.modifier_shift() then -- holding shift skips this
 		YSP.shadowform_stance()
 		YSP.vampiric_touch()
 		YSP.shadowword_pain()
 		YSP.vampiric_embrace()
 		YSP.mindblast()
-		YSP.deathspell()
 		YSP.mindflay()
 	end
+	--============= Targetless
+	YSP.mindblast_targetless()
+	YSP.shadowword_pain_any()
+	YSP.mindflay_targetless()
 	--============= Leveling
 	if player:level()<=20 then
 		YSP.smite()
 	end
-	--============= AOE fill
-	YSP.shadowword_execute_any()
-	YSP.shadowword_pain_any()
 end
-
 local spellIds_Loc = {
 }
 
@@ -298,8 +340,8 @@ _A.CR:Add("Priest", {
 	wow_ver = "3.3.5",
 	apep_ver = "1.1",
 	-- ids = spellIds_Loc,
-	-- blacklist = blacklist,
-	-- pooling = false,
-	load = exeOnLoad,
-	unload = exeOnUnload
+-- blacklist = blacklist,
+-- pooling = false,
+load = exeOnLoad,
+unload = exeOnUnload
 })									
