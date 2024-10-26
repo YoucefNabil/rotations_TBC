@@ -1,4 +1,4 @@
-local mediaPath, _A = ...
+local mediaPath, _A, _Y = ...
 local U = _A.Cache.Utils -- U.playerGUID
 local player
 local string_lower = string.lower
@@ -59,6 +59,7 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 	--==================== Events and event related
 	_A.mindflaytb = {}
 	_A.casttimers = {} -- doesnt work with channeled spells
+	_A.caststart = {} -- doesnt work with channeled spells
 	_A.Listener:Add("delaycasts", {"COMBAT_LOG_EVENT_UNFILTERED", "UNIT_SPELLCAST_SUCCEEDED"}, function(event, _, subevent, guidsrc, srcname, weirdnumber, guiddest, destname, sameweirdnumber, idd,spellname,lowweirdnumber,totalamount,overheal,thirdnumber)-- new
 		if guidsrc == U.playerGUID then
 			if subevent=="SPELL_PERIODIC_DAMAGE" and spellname == "Mind Flay" then
@@ -72,6 +73,11 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 	_A.Listener:Add("spellcasts", {"UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_STOP", "UNIT_SPELLCAST_FAILED"}, function(event, unit, spellname)-- no work with channels
 		if unit == "player" then
 			_A.casttimers[string_lower(spellname)] = _A.GetTime()
+		end
+	end)
+	_A.Listener:Add("antistutter_event", "UNIT_SPELLCAST_START", function(event, unit, spellname)-- no work with channels
+		if unit == "player" then
+			print(spellname)
 		end
 	end)
 	_A.Listener:Add("delayedspellcast", "UNIT_SPELLCAST_DELAYED", function(event, unit, spellname)-- no work with channels
@@ -308,8 +314,8 @@ local inCombat = function()
 		YSP.innerfire()
 		--============= Single Target Main rotation
 		YSP.shadowword_execute_any() -- Execute
+		YSP.shadowform_stance()
 		if not _A.modifier_shift() then -- holding shift skips this
-			YSP.shadowform_stance()
 			YSP.vampiric_touch()
 			YSP.shadowword_pain()
 			YSP.vampiric_embrace()
@@ -317,9 +323,11 @@ local inCombat = function()
 			YSP.mindflay()
 		end
 		--============= Targetless
-		YSP.shadowword_pain_any()
 		if not _A.modifier_shift() then -- holding shift skips this	
 			YSP.mindblast_targetless()
+		end
+		YSP.shadowword_pain_any()
+		if not _A.modifier_shift() then -- holding shift skips this	
 			YSP.mindflay_targetless()
 		end
 		--============= Leveling
@@ -329,7 +337,7 @@ local inCombat = function()
 	end
 end
 local spellIds_Loc = {
-}
+	}
 
 local blacklist = {
 }
@@ -339,11 +347,11 @@ _A.CR:Add("Priest", {
 	ic = inCombat,
 	ooc = inCombat,
 	use_lua_engine = true,
-gui = GUI,
-gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
-wow_ver = "3.3.5",
-apep_ver = "1.1",
--- ids = spellIds_Loc,
+	gui = GUI,
+	gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
+	wow_ver = "3.3.5",
+	apep_ver = "1.1",
+	-- ids = spellIds_Loc,
 -- blacklist = blacklist,
 -- pooling = false,
 load = exeOnLoad,
