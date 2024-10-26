@@ -193,7 +193,7 @@ local YRET = {
 			if target and target:enemy() and target:spellRange("Judgement") and not target:debuff("Judgement of the Crusader") and target:infront() and target:los() then return target:cast("Judgement", true) end
 		end
 	end,
-	SealofCommand = function() -- maybe mana check
+	SealofCommand = function() -- maybe mana check, big line is just to slot this between 0.4 and 1.7 right after an attack
 		local systime = _A.GetTime()
 		local target = Object("target")
 		if target and target:enemy() and target:debuff("Judgement of the Crusader") then
@@ -209,7 +209,7 @@ local YRET = {
 				local target = Object("target")
 				if target and target:enemy() and target:spellRange("Judgement") and target:debuff("Judgement of the Crusader") and target:infront() and target:los() then return target:cast("Judgement", true) end
 			end
-			end
+		end
 	end,
 	CS = function()
 		local systime = _A.GetTime()
