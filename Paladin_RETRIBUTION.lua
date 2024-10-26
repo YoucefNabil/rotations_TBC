@@ -64,7 +64,7 @@ local exeOnLoad = function() --==================== loading stuff for this profi
 		if guidsrc == U.playerGUID then
 			-- debugging, checking if both seals are damaging
 			if subevent == "SPELL_DAMAGE" then
-				print(spellname.." ".._A.GetTime())
+				-- print(spellname.." ".._A.GetTime())
 			end
 			--
 			if subevent == "SWING_DAMAGE" or subevent == "SWING_MISSED" then
