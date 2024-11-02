@@ -154,8 +154,9 @@ local function sealweave()
 	if _A.modifier_shift() and _A.nextattackat and _A.nextattackat - _A.GetTime() <= .3 then -- attack ready -- <= .3 works fine
 		local target = Object("target")
 		if IsCurrentSpell(6603)~=nil and IsCurrentSpell(6603)==1 and target and target:enemy() and target:debuff("Judgement of the Crusader") and target:inmelee() and target:infront() and target:los() then 
-			if not player:buff("Seal of Blood") and player:spellcooldown("Seal of Blood")<.3 then return player:cast("Seal of Blood") end
-			if not player:buff("Seal of the Martyr") and player:spellcooldown("Seal of the Martyr")<.3 then return player:cast("Seal of the Martyr") end
+			if player:spellexists("Seal of Blood") and not player:buff("Seal of Blood") and player:spellcooldown("Seal of Blood")<.3 then return player:cast("Seal of Blood") end
+			if player:spellexists("Seal of the Martyr") and not player:buff("Seal of the Martyr") and player:spellcooldown("Seal of the Martyr")<.3 then return player:cast("Seal of the Martyr") end
+			if not player:buff("Seal of Righteousness") and player:spellcooldown("Seal of Righteousness")<.3 and not player:buff("Seal of the Martyr") and not player:buff("Seal of Blood") then return player:cast("Seal of Righteousness") end
 		end
 	end
 end
@@ -179,7 +180,7 @@ local YRET = {
 	end,
 	-- Buff
 	blessing_kings = function()
-		if not player:buff("Blessing of Kings") and player:spellcooldown("Blessing of Kings") then return player:cast("Blessing of Kings") end
+		if player:spellexists("Blessing of Kings") and not player:buff("Blessing of Kings") and player:spellcooldown("Blessing of Kings") then return player:cast("Blessing of Kings") end
 	end,
 	-- Rotation
 	SealoftheCrusader = function()
@@ -199,16 +200,19 @@ local YRET = {
 		local target = Object("target")
 		if target and target:enemy() and target:debuff("Judgement of the Crusader") then
 			if (_A.nextattackat and ((((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) or not (IsCurrentSpell(6603)~=nil and IsCurrentSpell(6603)==1 and target and target:enemy() and target:inmelee() and target:infront() and target:los())))then
-				if _A.modifier_shift() and player:spellcooldown("Seal of Command")<.3 and not player:buff("Seal of Command") then return player:cast("Seal of Command(Rank 1)") end
-				if player:spellcooldown("Seal of Blood")<.3 and not player:buff("Seal of Blood") then return player:cast("Seal of Blood") end
-				if player:spellcooldown("Seal of the Martyr")<.3 and not player:buff("Seal of the Martyr") then return player:cast("Seal of the Martyr") end
+				if _A.modifier_shift() and player:spellexists("Seal of Command") and player:spellcooldown("Seal of Command")<.3 and not player:buff("Seal of Command") then return player:cast("Seal of Command(Rank 1)") end
+				if player:spellexists("Seal of Blood") and player:spellcooldown("Seal of Blood")<.3 and not player:buff("Seal of Blood") then return player:cast("Seal of Blood") end
+				if player:spellexists("Seal of the Martyr") and player:spellcooldown("Seal of the Martyr")<.3 and not player:buff("Seal of the Martyr") then return player:cast("Seal of the Martyr") end
+				if player:spellcooldown("Seal of Righteousness")<.3 and not player:buff("Seal of Righteousness") and not player:buff("Seal of the Martyr") and not player:buff("Seal of Blood") then return player:cast("Seal of Righteousness") end
 			end
 		end
 	end,
 	Judgement_Blood = function()
 		local systime = _A.GetTime()
-		if _A.modifier_shift() and _A.nextattackat and (((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) then
-			if player:spellcooldown("Judgement")==0 and player:buff("Seal of Blood") then
+		if 
+		_A.modifier_shift() and 
+		_A.nextattackat and (((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) then
+			if player:spellcooldown("Judgement")==0 and (player:buff("Seal of Blood") or player:buff("Seal of Righteousness")) then
 				local target = Object("target")
 				if target and target:enemy() and target:spellRange("Judgement") and target:debuff("Judgement of the Crusader") and target:infront() and target:los() then return target:cast("Judgement", true) end
 			end
@@ -217,7 +221,7 @@ local YRET = {
 	CS = function()
 		local systime = _A.GetTime()
 		if _A.nextattackat and (((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) then
-			if player:spellcooldown("Crusader Strike")<.3 and player:buff("Seal of Blood") then
+			if player:spellexists("Crusader Strike") and player:spellcooldown("Crusader Strike")<.3 and (player:buff("Seal of Blood") or player:buff("Seal of Righteousness")) then
 				local target = Object("target")
 				if target and target:enemy() and target:inmelee() and target:infront() and target:debuff("Judgement of the Crusader") and target:los() then return target:cast("Crusader Strike") end
 			end
