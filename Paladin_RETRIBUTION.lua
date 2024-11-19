@@ -175,7 +175,7 @@ local YRET = {
 	autoattack_on = function()
 		local target = Object("target")
 		if IsCurrentSpell(6603)~=nil and IsCurrentSpell(6603)~=1 and target and target:enemy() and target:alive() and target:inmelee() and target:infront() and target:los() then 
-			return player:cast(6603)
+			player:cast(6603)
 		end
 	end,
 	-- Buff
@@ -199,7 +199,7 @@ local YRET = {
 		local systime = _A.GetTime()
 		local target = Object("target")
 		if target and target:enemy() and target:alive() and target:debuff("Judgement of the Crusader") then
-			if (_A.nextattackat and ((((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) or not (IsCurrentSpell(6603)~=nil and IsCurrentSpell(6603)==1 and target and target:enemy() and target:inmelee() and target:infront() and target:los())))then
+			if (_A.nextattackat and (((((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) or _A.currentattackspeed<2.2) or not (IsCurrentSpell(6603)~=nil and IsCurrentSpell(6603)==1 and target and target:enemy() and target:inmelee() and target:infront() and target:los())))then
 				if _A.modifier_shift() and player:spellexists("Seal of Command") and player:spellcooldown("Seal of Command")<.3 and not player:buff("Seal of Command") then return player:cast("Seal of Command(Rank 1)") end
 				if player:spellexists("Seal of Blood") and player:spellcooldown("Seal of Blood")<.3 and not player:buff("Seal of Blood") then return player:cast("Seal of Blood") end
 				if player:spellexists("Seal of the Martyr") and player:spellcooldown("Seal of the Martyr")<.3 and not player:buff("Seal of the Martyr") then return player:cast("Seal of the Martyr") end
@@ -210,8 +210,9 @@ local YRET = {
 	Judgement_Blood = function()
 		local systime = _A.GetTime()
 		if 
-		_A.modifier_shift() and 
-		_A.nextattackat and (((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) then
+			-- _A.modifier_shift() and 
+			_A.nextattackat
+			and ((((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) or _A.currentattackspeed<2.2) then
 			if player:spellcooldown("Judgement")==0 and (player:buff("Seal of Blood") or player:buff("Seal of Righteousness")) then
 				local target = Object("target")
 				if target and target:enemy() and target:alive() and target:spellRange("Judgement") and target:debuff("Judgement of the Crusader") and target:infront() and target:los() then return target:cast("Judgement", true) end
@@ -220,7 +221,7 @@ local YRET = {
 	end,
 	CS = function()
 		local systime = _A.GetTime()
-		if _A.nextattackat and (((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) then
+		if _A.nextattackat and ((((_A.nextattackat - systime) > 1.7) and ((_A.nextattackat - systime) < (_A.currentattackspeed - 0.4))) or _A.currentattackspeed<2.2) then
 			if player:spellexists("Crusader Strike") and player:spellcooldown("Crusader Strike")<.3 and (player:buff("Seal of Blood") or player:buff("Seal of Righteousness")) then
 				local target = Object("target")
 				if target and target:enemy() and target:alive() and target:inmelee() and target:infront() and target:debuff("Judgement of the Crusader") and target:los() then return target:cast("Crusader Strike") end
@@ -230,7 +231,7 @@ local YRET = {
 }
 --==================== Running the rotation
 local inCombat = function()
-	if not player then player = Object("player") end
+	if not player then player = Object("player") return end
 	--=============Debugging section
 	--=============
 	if _A.buttondelayfunc()  then return end -- pauses when pressing spells manually
@@ -261,9 +262,9 @@ _A.CR:Add("Paladin", {
 	gui_st = {title="CR Settings", color="87CEFA", width="315", height="370"},
 	wow_ver = "3.3.5",
 	apep_ver = "1.1",
-	-- ids = spellIds_Loc,
-	-- blacklist = blacklist,
-	-- pooling = false,
-	load = exeOnLoad,
-	unload = exeOnUnload
+-- ids = spellIds_Loc,
+-- blacklist = blacklist,
+-- pooling = false,
+load = exeOnLoad,
+unload = exeOnUnload
 })													
